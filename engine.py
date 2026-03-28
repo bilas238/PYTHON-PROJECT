@@ -8,11 +8,11 @@ class GameEngine:
         self.player = Player(375, 520)
         self.enemies = []
         self.score = 0
-        # Font for score and messages
+        # Font for scores and messages
         self.font = pygame.font.SysFont("Arial", 32)
         self.WHITE = (255, 255, 255)
 
-    # Function to display messages on screen
+    # show any message on screen
     def show_message(self, text, y_offset=0):
         msg = self.font.render(text, True, self.WHITE)
         rect = msg.get_rect(center=(400, 300 + y_offset))
@@ -21,51 +21,73 @@ class GameEngine:
     def run(self):
         clock = pygame.time.Clock()
         running = True
+        # Variable to check if game is paused
+        paused = False
         
         while running:
-            # Clear screen with black
-            self.screen.fill((0, 0, 0))
-            
+            # Quit or Key Press
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return self.score
+                
+                # Check if 'P' key is pressed to pause
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        paused = not paused
 
-            # Player movement
+            # Logic if game is paused
+            if paused:
+                # Show pause messages
+                self.show_message("GAME PAUSED", -30)
+                self.show_message("Press 'P' to Resume", 30)
+                pygame.display.flip()
+                clock.tick(10)
+                # Skip the rest of the game loop
+                continue
+
+            # --- GAME LOGIC STARTS HERE ---
+            
+            # Clear screen with black
+            self.screen.fill((0, 0, 0))
+
+            # Move player using keys
             keys = pygame.key.get_pressed()
             self.player.move(keys, 800)
 
-            # Enemy spawning logic
+            # Spawn new enemy
             if pygame.time.get_ticks() % 60 == 0:
                 self.enemies.append(Enemy(800))
 
+            # Update all enemies
             for enemy in self.enemies[:]:
                 enemy.update()
                 
-                # Check for collision
+                # If player hits an enemy
                 if enemy.rect.colliderect(self.player.rect):
                     # Show Game Over screen
                     self.screen.fill((50, 0, 0))
                     self.show_message("GAME OVER!", -30)
                     self.show_message(f"Final Score: {self.score}", 30)
                     pygame.display.flip()
-                    # Pause for 2 seconds
+                    # Wait 2 seconds
                     time.sleep(2)
                     return self.score
                 
-                # Update score and remove enemy
+                # If enemy passes the screen
                 if enemy.rect.y > 600:
                     self.enemies.remove(enemy)
                     self.score += 1
                 
                 enemy.draw(self.screen)
 
+            # Draw player
             self.player.draw(self.screen)
             
-            # Draw score board
+            # Show current score
             score_img = self.font.render(f"Score: {self.score}", True, self.WHITE)
             self.screen.blit(score_img, (15, 15))
             
-            # Refresh display
+            # Update screen
             pygame.display.flip()
-            # game speed 60 FPS
+            # game speed 60 fps
             clock.tick(60)
