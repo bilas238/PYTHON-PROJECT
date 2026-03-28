@@ -43,19 +43,19 @@ class GameEngine:
                    
                    # GAME OVER SCREEN 
                     
-                    
-                    self.screen.fill((50, 0, 0))
-
-
-                    # Dark Red background
-                   
-                   self.show_message("GAME OVER!", -30)
-                    self.show_message(f"Final Score: {self.score}", 30)
-                    pygame.display.flip()
-                    time.sleep(2) 
-                    
-                    # Pause 2 seconds
-                  
+                 if enemy.rect.colliderect(self.player.rect):
+            # GAME OVER SCREEN
+            self.screen.fill((50, 0, 0)) 
+            
+            # Dark Red background
+            
+            self.show_message("GAME OVER!", -30)
+            self.show_message(f"Final Score: {self.score}", 30)
+            pygame.display.flip()
+            time.sleep(2) 
+            # Pause 2 seconds
+            
+            return self.score   
                   return self.score
                 
                 if enemy.rect.y > 600:
